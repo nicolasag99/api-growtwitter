@@ -49,7 +49,7 @@ model Twitte {
   id        String   @id @default(uuid())
   userId    String
   tweetId   String
-
+  
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   tweet     Twitte    @relation(fields: [tweetId], references: [id], onDelete: Cascade)
 
