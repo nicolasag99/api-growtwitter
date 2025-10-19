@@ -1,1 +1,2 @@
-console.log("Olá Nicolas")
+// src/app.ts
+console.log("Hello!")
