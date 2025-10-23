@@ -1,5 +1,7 @@
 export interface CreateTwitte {
     content: string;
-    likes: string;
-    reply: string;
+    likes: number;
+    replies: number;
+    comments: string;
+    userId: string;
 }
