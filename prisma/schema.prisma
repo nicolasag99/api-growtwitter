@@ -33,9 +33,9 @@ model User {
 model Twitte {
   id String @id @default(uuid())
   content String @db.VarChar(500)
-  likes BigInt 
-  replies BigInt
-  comments String @db.VarChar(300)
+  likes Int @default(0)
+  replies Int @default(0)
+  comments String @default("") @db.VarChar(300)
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)

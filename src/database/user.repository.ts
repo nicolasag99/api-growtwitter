@@ -21,7 +21,7 @@ export class UserRepository {
         } catch (error: any) {
             return handlerError(error);
         }
-        }
+    }
 
     // FUNCTION GET
     public async list() {
@@ -34,9 +34,10 @@ export class UserRepository {
     }
 
     //FUNCTION UPDATE    
-    public async update(data: CreateUser) {
+    public async update(id: string, data: CreateUser) {
         try {
-            const user = await prisma.user.create({
+            const user = await prisma.user.update({
+                where: { id: id },
                 data: {
                     name: data.name,
                     userName: data.userName,
@@ -44,9 +45,8 @@ export class UserRepository {
                     password: data.password,
                     bio: data.bio ?? null
                 },
-                });
-                return user;
-            
+            });
+            return user;
         } catch (error: any) {
             return handlerError(error);
         }
@@ -65,4 +65,5 @@ export class UserRepository {
             return handlerError(error);
         }
     }
+
 }

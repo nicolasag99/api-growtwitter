@@ -6,38 +6,44 @@ export class TwitteRepository {
 
     //FUNCTION CREATE
     public async create(data: CreateTwitte) {
-        try {
-          const twitte = await prisma.twitte.create({
-            data: {
-              content: data.content,
-              replies: data.replies,
-              likes: data.likes,
-              comments: data.comments,
-      
-              // Relaciona com um usuário já existente
-              user: {
-                connect: { id: data.userId } // <--- conecta pelo id do usuário
-              }
-            },
-            include: {
-              user: true // opcional: retorna o usuário junto
+      try {
+        const twitte = await prisma.twitte.create({
+          data: {
+            content: data.content,
+            replies: data.replies,
+            likes: data.likes,
+            comments: data.comments,
+            user: {
+              connect: { id: data.userId }
             }
-          });
-          return twitte;
-        } catch (error: any) {
-          return handlerError(error);
-        }
+          },
+          include: {
+            user: true
+          }
+        });
+    
+        console.log("Novo twitte criado:", twitte);
+        return twitte;
+    
+      } catch (error: any) {
+        console.error("Erro ao criar novo Twitte:", error);
+        throw error;
       }
+    }
+    
       
 
     // FUNCTION GET
 
     public async list() {
         try {
-            const twittes = await prisma.twitte.findMany(); // Corrected method to fetch all records
+            const twittes = await prisma.twitte.findMany();
             return twittes;
         } catch (error: any) {
-            return handlerError(error);
+          console.error("Erro ao listtar todos os Twittes:", error);
+          throw error;
         }
     }
+
+    
 }
