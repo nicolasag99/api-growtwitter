@@ -1,4 +1,3 @@
-import { handlerError } from "../config/error.config.js"
 import { prisma } from "../config/prisma.config.js";
 import type { CreateTwitte } from "../dtos/create-twitte.dtos.js"
 
@@ -30,8 +29,7 @@ export class TwitteRepository {
         throw error;
       }
     }
-    
-      
+         
 
     // FUNCTION GET
 
@@ -43,7 +41,5 @@ export class TwitteRepository {
           console.error("Erro ao listtar todos os Twittes:", error);
           throw error;
         }
-    }
-
-    
+    }  
 }

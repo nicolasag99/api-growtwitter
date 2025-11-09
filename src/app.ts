@@ -3,12 +3,14 @@ import { UserRepository } from "./database/user.repository.js";
 import "dotenv/config";
 import { handlerError } from "./config/error.config.js";
 import { TwitteRepository } from "./database/twitte.repository.js";
+import { LikeRepository } from "./database/like.repository.js";
 
 const app = express();
 app.use(express.json());
 
 const userRepository = new UserRepository();
 const twitteRepository = new TwitteRepository();
+const likeRepository = new LikeRepository();
 
   // GET - listar usuários
   app.get("/user", async (req, res) => {
@@ -61,10 +63,9 @@ const twitteRepository = new TwitteRepository();
     }
   })
 
-
-
   // ROTAS TWITTE
 
+  //CRIAR TWITTE
   app.post("/twitte/:id", async (req, res) => {
 
     try {
@@ -74,7 +75,7 @@ const twitteRepository = new TwitteRepository();
 
       return res.status(200).send({
         ok: true,
-        message: "Twitte criaco com sucesso",
+        message: "Twitte criado com sucesso",
         data: twitte
       })
 
@@ -88,8 +89,6 @@ const twitteRepository = new TwitteRepository();
     }
 
   })
-
-
 
   app.post("/twitte", async (req, res) => {
     try {
@@ -112,11 +111,7 @@ const twitteRepository = new TwitteRepository();
     }
   });
   
-
   //LISTAR TODOS OS TWITTES
-
-
-
   app.get("/twitte", async (req, res) => {
     try {
       const twittes = await twitteRepository.list();
@@ -126,18 +121,39 @@ const twitteRepository = new TwitteRepository();
         data: twittes,
       });
     } catch (error: any) {
-      console.error("Erro ao listar twittes:", error);
+      console.error(error);
       return res.status(500).send({
         ok: false,
-        message: "Erro interno ao listar os twittes",
+        message: "Erro ao listar os twittes",
         error: error.message || error,
       });
     }
   });
 
-
-
+  //CURTIR TWITTE 
+  app.post("/like", async (req, res) => {
+    try {
+      const { userId, tweetId } = req.body;
   
+      if (!userId || !tweetId) {
+        return res.status(400).json({ error: "userId e tweetId são obrigatórios" });
+      }
+  
+      const result = await likeRepository.likeTwitte({
+        userId, tweetId,
+        
+      });
+  
+      return res.status(200).json(result);
+  
+    } catch (error) {
+      console.error("Erro na rota /like:", error);
+      return res.status(500).json({ error: "Erro ao dar like" });
+    }
+  });
+
+
+
 app.listen(process.env.PORT || 3000, () => {
     console.log(`🔥 Rodando na porta ${process.env.PORT || 3000}`);
   });
