@@ -1,4 +1,4 @@
-import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library"
+import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 
 export function handlerError(error: any) {
     if(error instanceof PrismaClientKnownRequestError) {

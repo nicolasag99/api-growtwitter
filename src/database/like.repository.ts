@@ -1,6 +1,5 @@
-import { checkPrime } from "crypto";
 import { prisma } from "../config/prisma.config.js";
-import type { CreateLike} from "../dtos/create.like.dtos.js"
+import type { CreateLike} from "../dtos/create.like.dtos.js";
 
 
 

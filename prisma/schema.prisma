@@ -28,6 +28,7 @@ model User {
   Following Follows[] @relation("user_following")
 
   @@map("user")
+  Reply Reply[]
 }
 
 model Twitte {
@@ -42,6 +43,8 @@ model Twitte {
   
   Follows Follows[] @relation("user_followers")
   Like Like[]
+
+  Reply Reply[]
 }
 
   model Like {
@@ -71,4 +74,18 @@ model Follows {
   @@unique([followerId, followingId])
   @@map("follows")
   Twitte Twitte[] @relation("user_followers")
+}
+
+model Reply {
+  id String   @id @default(uuid())
+  userId String
+  tweetId String
+  content String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tweet Twitte @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@map("replies")
 }

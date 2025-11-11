@@ -4,6 +4,8 @@ import "dotenv/config";
 import { handlerError } from "./config/error.config.js";
 import { TwitteRepository } from "./database/twitte.repository.js";
 import { LikeRepository } from "./database/like.repository.js";
+import { FollowRepository } from "./database/follow.repository.js";
+import { ReplyRepository } from "./database/reply.repository.js";
 
 const app = express();
 app.use(express.json());
@@ -11,21 +13,60 @@ app.use(express.json());
 const userRepository = new UserRepository();
 const twitteRepository = new TwitteRepository();
 const likeRepository = new LikeRepository();
+const followRepository = new FollowRepository();
+const replyRepository = new ReplyRepository();;
 
   // GET - listar usuários
-  app.get("/user", async (req, res) => {
+  app.get("/users", async (req, res) => {
       try {
-        const users = await userRepository.list();
+        const users = await userRepository.listAllUser();
         return res.status(200).send({
           ok: true,
-          message: "Usuário criado com sucesso",
+          message: "Usuários listados com sucesso",
           data: users
       })
       } catch (error) {
         res.status(500).json({ message: "Erro ao listar usuários", error });
       }
     });
+
+  // GET - buscar um usuário
+
+  app.get("/user/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
   
+      if (!id) {
+        return res.status(400).json({
+          ok: false,
+          message: "O ID do usuário é obrigatório.",
+        });
+      }
+  
+      const user = await userRepository.listUser(id);
+  
+      if (!user) {
+        return res.status(404).json({
+          ok: false,
+          message: "Usuário não encontrado.",
+        });
+      }
+  
+      return res.status(200).json({
+        ok: true,
+        message: "Usuário listado com sucesso.",
+        data: user,
+      });
+    } catch (error) {
+      console.error("Erro ao listar usuário:", error);
+      return res.status(500).json({
+        ok: false,
+        message: "Erro interno ao listar usuário.",
+      });
+    }
+  });
+  
+
   // POST - criar usuário
   app.post("/user", async (req, res) => {
 
@@ -152,9 +193,78 @@ const likeRepository = new LikeRepository();
     }
   });
 
+  //DEIXAR/SEGUIR USUARIO
 
+  app.post("/follow", async (req, res) => {
+    const { followerId, followingId } = req.body;
+
+    try {
+      const result = await followRepository.toggleFollow({ followerId, followingId });
+      return res.status(200).json(result);
+    } catch (error) {
+      return res.status(500).json({ error: "Erro ao seguir/deixar de seguir o usuário." });
+    }
+  })
+
+
+//REPLY
+
+//POST REPLIES
+app.post("/reply", async (req, res) => {
+  try {
+    const { userId, tweetId, content } = req.body;
+
+    if (!userId || !tweetId) {
+      return res.status(400).json({ error: "userId e tweetId são obrigatórios" });
+    }
+
+    const reply = await replyRepository.createReply({ userId, tweetId, content });
+    res.status(201).json(reply);
+
+  } catch (error) {
+    console.error("Erro na rota /reply:", error);
+    res.status(500).json({ error: "Erro ao criar reply" });
+  }
+});
+
+//LIST REPLIES
+app.get("/replies", async (req, res) => {
+  try {
+    const replies = await replyRepository.listReplies();
+    res.status(200).json(replies);
+  } catch (error) {
+    console.error("Erro ao listar replies:", error);
+    res.status(500).json({ error: "Erro interno" });
+  }
+});
+
+
+app.post("/login", async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).send({
+        ok: false,
+        message: "Email e senha são obrigatórios",
+      });
+    }
+
+    const user = await userRepository.login(email, password);
+
+    return res.status(200).send({
+      ok: true,
+      data: user,
+    });
+  } catch (error: any) {
+    return res.status(401).send({
+      ok: false,
+      message: error.message || "Falha no login",
+    });
+  }
+});
 
 app.listen(process.env.PORT || 3000, () => {
     console.log(`🔥 Rodando na porta ${process.env.PORT || 3000}`);
   });
-  
+

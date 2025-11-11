@@ -34,12 +34,26 @@ export class TwitteRepository {
     // FUNCTION GET
 
     public async list() {
-        try {
-            const twittes = await prisma.twitte.findMany();
-            return twittes;
-        } catch (error: any) {
-          console.error("Erro ao listtar todos os Twittes:", error);
-          throw error;
-        }
-    }  
+      try {
+        const twittes = await prisma.twitte.findMany({
+          select: {
+            id: true,
+            content: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                userName: true,
+              },
+            },
+          }
+        });
+    
+        return twittes;
+      } catch (error: any) {
+        console.error("Erro ao listar todos os Twittes:", error);
+        throw error;
+      }
+    }
+    
 }
