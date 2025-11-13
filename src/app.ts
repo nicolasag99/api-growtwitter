@@ -1,1 +1,21 @@
-console.log("Olá Nicolas")
+import express from "express";
+import "dotenv/config";
+import { TwitteRepository } from "./database/twitte.repository.js";
+import userRoutes from "./routes/user.routes.js";
+import twitteRoutes from "./routes/twitte.routes.js";
+import followRoutes from "./routes/follow.routes.js";
+import replyRoutes from "./routes/reply.routes.js";
+
+const app = express();
+app.use(express.json());
+
+app.use("/user", userRoutes);
+app.use("/twitte", twitteRoutes);
+app.use("/follow", followRoutes);
+app.use("/reply", replyRoutes);
+
+const twitteRepository = new TwitteRepository();
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log(`Rodando na porta ${process.env.PORT || 3000}`);
+});

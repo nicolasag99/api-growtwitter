@@ -6,10 +6,86 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+
+model User {
+  id String @id @default(uuid())
+  name String @db.VarChar(50)
+  userName String @unique @map("user_name")
+  email String @unique
+  password String 
+  bio String? @db.VarChar(300)
+
+  twittes  Twitte[]     // back-relation: um User -> muitos Twitte
+  Like Like[]
+  Follows Follows[] @relation("user_followers")
+  Following Follows[] @relation("user_following")
+
+  @@map("user")
+  Reply Reply[]
+}
+
+model Twitte {
+  id String @id @default(uuid())
+  content String @db.VarChar(500)
+  likes Int @default(0)
+  replies Int @default(0)
+  comments String @default("") @db.VarChar(300)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
+  
+  Follows Follows[] @relation("user_followers")
+  Like Like[]
+
+  Reply Reply[]
+}
+
+  model Like {
+  id        String   @id @default(uuid())
+  userId    String
+  tweetId   String
+  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tweet     Twitte    @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, tweetId])
+  @@map("likes")
+}
+
+model Follows {
+  id           String  @id @default(uuid())
+  followerId   String
+  followingId  String
+
+  follower     User    @relation("user_following", fields: [followerId], references: [id], onDelete: Cascade)
+  following    User    @relation("user_followers", fields: [followingId], references: [id], onDelete: Cascade)
+
+  createdAt    DateTime @default(now())
+
+  @@unique([followerId, followingId])
+  @@map("follows")
+  Twitte Twitte[] @relation("user_followers")
+}
+
+model Reply {
+  id String   @id @default(uuid())
+  userId String
+  tweetId String
+  content String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tweet Twitte @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+
+  createdAt  DateTime @default(now())
+
+  @@map("replies")
 }
