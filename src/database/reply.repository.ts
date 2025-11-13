@@ -1,5 +1,5 @@
 import { prisma } from "../config/prisma.config.js";
-import type { CreateReply } from "../dtos/create.reply.js";
+import type { CreateReply } from "../dtos/create.reply.js"
 import { handlerError } from "../config/error.config.js";
 
 
