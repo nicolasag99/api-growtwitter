@@ -4,6 +4,18 @@ import { handlerError } from "../config/error.config.js";
 
 
 export class ReplyRepository {
+  public async createReplyByLoggedUser(
+    loggedUserId: string,
+    tweetId: string,
+    content?: string
+  ) {
+    return this.createReply(
+      content === undefined
+        ? { userId: loggedUserId, tweetId }
+        : { userId: loggedUserId, tweetId, content }
+    );
+  }
+
   public async createReply(data: CreateReply) {
     try {
       // Verifica se o tweet existe

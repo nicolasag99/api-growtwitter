@@ -8,19 +8,22 @@ export class ReplyController {
   //POST - CREATE REPLIES
   async createReplay(req: Request, res: Response) {
     try {
-      const { userId, tweetId, content } = req.body;
+      const { tweetId, content } = req.body;
+      const loggedUserId = (req as any).user?.id;
 
-      if (!userId || !tweetId) {
-        return res
-          .status(400)
-          .json({ error: "userId e tweetId são obrigatórios" });
+      if (!loggedUserId) {
+        return res.status(401).json({ error: "Usuário não autenticado." });
       }
 
-      const reply = await replyRepository.createReply({
-        userId,
+      if (!tweetId) {
+        return res.status(400).json({ error: "tweetId é obrigatório" });
+      }
+
+      const reply = await replyRepository.createReplyByLoggedUser(
+        loggedUserId,
         tweetId,
-        content,
-      });
+        content
+      );
       res.status(201).json(reply);
     } catch (error) {
       console.error("Erro na rota /reply:", error);

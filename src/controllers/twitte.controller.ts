@@ -50,18 +50,23 @@ export class TwitteController {
   //POST LIKE TWITTE
   async likeTwitte(req: Request, res: Response) {
     try {
-      const { userId, tweetId } = req.body;
+      const { tweetId } = req.body;
+      const loggedUserId = (req as any).user?.id;
 
-      if (!userId || !tweetId) {
-        return res
-          .status(400)
-          .json({ error: "userId e tweetId são obrigatórios" });
+      if (!loggedUserId) {
+        return res.status(401).json({ error: "Usuário não autenticado." });
       }
 
-      const result = await likeRepository.likeTwitte({
-        userId,
-        tweetId,
-      });
+      if (!tweetId) {
+        return res
+          .status(400)
+          .json({ error: "tweetId é obrigatório" });
+      }
+
+      const result = await likeRepository.likeTwitteByLoggedUser(
+        loggedUserId,
+        tweetId
+      );
 
       return res.status(200).json(result);
     } catch (error) {
@@ -69,4 +74,39 @@ export class TwitteController {
       return res.status(500).json({ error: "Erro ao dar like" });
     }
   }
-}
+
+  //GET - LIST TWITTE BY USER
+
+  async listByUser(req: Request, res: Response) {
+    try {
+      const { userId } = req.params;
+      if (!userId) {
+        return res.status(400).json({ error: "userId é obrigatório" });
+      }
+      const twittes = await twitteRepository.listByUser(userId);
+      if (twittes.length === 0) {
+        return res.status(404).json({ error: "Nenhum twitte encontrado" });
+      }
+
+      return res.status(200).json(twittes);
+    }
+    catch (error: any) {
+      console.error("Erro ao listar twittes do usuário:", error);
+      return res.status(500).json({ error: "Erro ao listar twittes do usuário" });
+    }
+  }
+  
+  // async listByUser(req: Request, res: Response) {
+  //   try {
+  //     const { userId } = req.params; 
+  //     if (!userId) {
+  //       return res.status(400).json({ error: "userId é obrigatório" });
+  //     }
+  //     const twittes = await twitteRepository.listByUser(userId);
+  //     return res.status(200).json(twittes);
+  //     } catch (error: any) {
+  //       console.error("Erro ao listar twittes do usuário:", error);
+  //       return res.status(500).json({ error: "Erro ao listar twittes do usuário" });
+  //     }
+  //   }
+  }

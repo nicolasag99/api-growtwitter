@@ -4,32 +4,9 @@ import { UserRepository } from "../database/user.repository.js";
 const userRepository = new UserRepository();
 
 export class UserController {
-  async login(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
-
-      if (!email || !password) {
-        return res.status(400).send({
-          ok: false,
-          message: "Email e senha são obrigatórios",
-        });
-      }
-
-      const user = await userRepository.login(email, password);
-
-      return res.status(200).send({
-        ok: true,
-        data: user,
-      });
-    } catch (error: any) {
-      return res.status(401).send({
-        ok: false,
-        message: error.message || "Falha no login",
-      });
-    }
-  }
 
   //GET - LIST ALL USERS
+  
   async listAllUser(req: Request, res: Response) {
     try {
       const users = await userRepository.listAllUser();
