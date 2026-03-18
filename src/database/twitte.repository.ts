@@ -3,7 +3,8 @@ import type { CreateTwitte } from "../dtos/create-twitte.dtos.js"
 
 export class TwitteRepository {
 
-    //FUNCTION CREATE
+    //FUNCTION CREATE - CREATE TWITTE
+
     public async create(data: CreateTwitte) {
       try {
         const twitte = await prisma.twitte.create({
@@ -31,7 +32,7 @@ export class TwitteRepository {
     }
          
 
-    // FUNCTION GET
+    // FUNCTION GET - LIST ALL TWITTES
 
     public async list() {
       try {
@@ -55,5 +56,21 @@ export class TwitteRepository {
         throw error;
       }
     }
+
+    // FUNCTION GET - LIST TWITTE BY USER
+
+    public async listByUser(userId: string) {
+      try {
+        const twittes = await prisma.twitte.findMany({
+          where: { userId },
+        });
+        return twittes;
+      }
+      catch (error: any) {
+        console.error("Erro ao listar twittes do usuário:", error);
+        throw error;
+      }
+    }
     
 }
+

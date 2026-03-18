@@ -5,13 +5,13 @@ import type { CreateLike} from "../dtos/create.like.dtos.js";
 
 export class LikeRepository {
 
-    public async likeTwitte(data: CreateLike) {
+    public async likeTwitteByLoggedUser(loggedUserId: string, tweetId: string) {
         try {
           
           const existingLike = await prisma.like.findFirst({
             where: {
-              userId: data.userId,
-              tweetId: data.tweetId
+              userId: loggedUserId,
+              tweetId
             }
           });
       
@@ -19,14 +19,14 @@ export class LikeRepository {
             
             await prisma.like.create({
               data: {
-                userId: data.userId,
-                tweetId: data.tweetId
+                userId: loggedUserId,
+                tweetId
               }
             });
       
             
             await prisma.twitte.update({
-              where: { id: data.tweetId },
+              where: { id: tweetId },
               data: {
                 likes: { increment: 1 }
               }
@@ -41,7 +41,7 @@ export class LikeRepository {
       
             
             await prisma.twitte.update({
-              where: { id: data.tweetId },
+              where: { id: tweetId },
               data: {
                 likes: { decrement: 1 }
               }
@@ -55,5 +55,9 @@ export class LikeRepository {
           throw error;
         }
       }
+
+    public async likeTwitte(data: CreateLike) {
+      return this.likeTwitteByLoggedUser(data.userId, data.tweetId);
+    }
       
 }

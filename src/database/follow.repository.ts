@@ -2,12 +2,17 @@ import { prisma } from "../config/prisma.config.js"
 import type { CreateFollow } from "../dtos/create.follow.js"
 
 export class FollowRepository {
-  public async toggleFollow(data: CreateFollow) {
+
+  public async toggleFollowByLoggedUser(loggedUserId: string, followingId: string) {
     try {
+      if (loggedUserId === followingId) {
+        throw new Error("Você não pode seguir a si mesmo.");
+      }
+
       const existingFollow = await prisma.follows.findFirst({
         where: {
-          followerId: data.followerId,
-          followingId: data.followingId,
+          followerId: loggedUserId,
+          followingId,
         },
       });
 
@@ -18,20 +23,44 @@ export class FollowRepository {
           },
         });
 
-        return { message: "Deixou de seguir o usuário.", isFollowing: false };
-      } else {
-        await prisma.follows.create({
-          data: {
-            followerId: data.followerId,
-            followingId: data.followingId,
-          },
+        const userFollowed = await prisma.user.findUnique({
+          where: { id: followingId },
+          select: { name: true, userName: true },
         });
-
-        return { message: "Você está seguindo o usuário.", isFollowing: true };
+        const name = userFollowed?.name ?? "Usuário";
+        const userName = userFollowed?.userName ?? "desconhecido";
+        console.log(`Deixou de seguir:  ${userName}`);
+        return {
+          message: `Deixou de seguir ${userName}.`,
+          isFollowing: false,
+        };
       }
+
+      await prisma.follows.create({
+        data: {
+          followerId: loggedUserId,
+          followingId,
+        },
+      });
+
+      const userFollowed = await prisma.user.findUnique({
+        where: { id: followingId },
+        select: { name: true, userName: true },
+      });
+      const name = userFollowed?.name ?? "Usuário";
+      const userName = userFollowed?.userName ?? "desconhecido";
+      console.log(`Seguindo: ${userName}`);
+      return {
+        message: `Você está seguindo ${userName}.`,
+        isFollowing: true,
+      };
     } catch (error) {
       console.error("Erro ao seguir/deixar de seguir:", error);
       throw error;
     }
+  }
+
+  public async toggleFollow(data: CreateFollow) {
+    return this.toggleFollowByLoggedUser(data.followerId, data.followingId);
   }
 }

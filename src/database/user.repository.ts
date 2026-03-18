@@ -38,12 +38,13 @@ export class UserRepository {
           name: true,
           userName: true,
           bio: true,
-          twittes: true,
+          // twittes: true,
 
           _count: {
             select: {
               Follows: true,
               Following: true,
+              twittes: true,
             },
           },
         },
@@ -92,6 +93,7 @@ export class UserRepository {
   }
 
   //FUNCTION UPDATE
+
   public async update(id: string, data: CreateUser) {
     try {
       const user = await prisma.user.update({
