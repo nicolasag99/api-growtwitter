@@ -9,9 +9,18 @@ const likeRepository = new LikeRepository();
 export class TwitteController {
   async createTwitte(req: Request, res: Response) {
     try {
-      const { id } = req.params;
-      const data = req.body;
-      const twitte = await twitteRepository.create(data);
+      const { content } = req.body;
+      const loggedUserId = (req as any).user?.id;
+
+      if (!loggedUserId) {
+        return res.status(401).json({ error: "Usuário não autenticado." });
+      }
+
+      if (!content) {
+        return res.status(400).json({ error: "content é obrigatório" });
+      }
+
+      const twitte = await twitteRepository.createByLoggedUser(loggedUserId, content);
 
       return res.status(200).send({
         ok: true,
@@ -96,17 +105,4 @@ export class TwitteController {
     }
   }
   
-  // async listByUser(req: Request, res: Response) {
-  //   try {
-  //     const { userId } = req.params; 
-  //     if (!userId) {
-  //       return res.status(400).json({ error: "userId é obrigatório" });
-  //     }
-  //     const twittes = await twitteRepository.listByUser(userId);
-  //     return res.status(200).json(twittes);
-  //     } catch (error: any) {
-  //       console.error("Erro ao listar twittes do usuário:", error);
-  //       return res.status(500).json({ error: "Erro ao listar twittes do usuário" });
-  //     }
-  //   }
   }

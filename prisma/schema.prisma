@@ -29,6 +29,8 @@ model User {
 
   @@map("user")
   Reply Reply[]
+  ReplyLike ReplyLike[]
+  Comment Comment[]
 }
 
 model Twitte {
@@ -37,6 +39,7 @@ model Twitte {
   likes Int @default(0)
   replies Int @default(0)
   comments String @default("") @db.VarChar(300)
+  createdAt DateTime @default(now())
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
@@ -45,6 +48,7 @@ model Twitte {
   Like Like[]
 
   Reply Reply[]
+  Comment Comment[]
 }
 
   model Like {
@@ -81,11 +85,41 @@ model Reply {
   userId String
   tweetId String
   content String?
+  likes Int @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   tweet Twitte @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+  ReplyLike ReplyLike[]
 
   createdAt  DateTime @default(now())
 
   @@map("replies")
+}
+
+model ReplyLike {
+  id String @id @default(uuid())
+  userId String
+  replyId String
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  reply Reply @relation(fields: [replyId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, replyId])
+  @@map("reply_likes")
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  userId    String
+  tweetId   String
+  content   String   @db.VarChar(500)
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  tweet     Twitte   @relation(fields: [tweetId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@map("comments")
 }

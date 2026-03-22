@@ -6,12 +6,18 @@ const twitteController = new TwitteController();
 const twitteRoutes = Router();
 
 
-twitteRoutes.post("/create/:id", (req, res) => twitteController.createTwitte(req, res));
-twitteRoutes.get("/", (req, res) => twitteController.listAllTwittes(req, res));
+twitteRoutes.post("/create/:id", authMiddleware, (req, res) =>
+  twitteController.createTwitte(req, res)
+);
+twitteRoutes.get("/", authMiddleware, (req, res) =>
+  twitteController.listAllTwittes(req, res)
+);
 twitteRoutes.post("/like", authMiddleware, (req, res) =>
   twitteController.likeTwitte(req, res)
 );
-twitteRoutes.get("/:userId", (req, res) => twitteController.listByUser(req, res));
+twitteRoutes.get("/:userId", authMiddleware, (req, res) =>
+  twitteController.listByUser(req, res)
+);
 
 
 export default twitteRoutes;

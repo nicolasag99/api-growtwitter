@@ -1,7 +1,9 @@
 import type { Request, Response } from "express";
 import { UserRepository } from "../database/user.repository.js";
+import { FollowRepository } from "../database/follow.repository.js";
 
 const userRepository = new UserRepository();
+const followRepository = new FollowRepository();
 
 export class UserController {
 
@@ -47,10 +49,17 @@ export class UserController {
         });
       }
 
+      const loggedUserId = (req as any).user?.id;
+      let data = user as Record<string, unknown>;
+      if (loggedUserId && loggedUserId !== id) {
+        const isFollowing = await followRepository.isFollowing(loggedUserId, id);
+        data = { ...user, isFollowing };
+      }
+
       return res.status(200).json({
         ok: true,
         message: "Usuário listado com sucesso.",
-        data: user,
+        data,
       });
     } catch (error) {
       console.error("Erro ao listar usuário:", error);

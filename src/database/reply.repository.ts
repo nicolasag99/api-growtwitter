@@ -78,6 +78,7 @@ export class ReplyRepository {
             },
           },
         },
+        orderBy: { createdAt: 'desc' },
       });
 
       return replies;
