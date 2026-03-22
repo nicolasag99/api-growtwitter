@@ -4,18 +4,18 @@ import type { CreateTwitte } from "../dtos/create-twitte.dtos.js"
 export class TwitteRepository {
 
     //FUNCTION CREATE - CREATE TWITTE
+    public async createByLoggedUser(loggedUserId: string, content: string) {
+      return this.create({ content, userId: loggedUserId });
+    }
 
-    public async create(data: CreateTwitte) {
+    public async create(data: CreateTwitte & { userId: string }) {
       try {
         const twitte = await prisma.twitte.create({
           data: {
             content: data.content,
-            replies: data.replies,
-            likes: data.likes,
-            comments: data.comments,
             user: {
-              connect: { id: data.userId }
-            }
+              connect: { id: data.userId },
+            },
           },
           include: {
             user: true
@@ -40,6 +40,10 @@ export class TwitteRepository {
           select: {
             id: true,
             content: true,
+            likes: true,
+            replies: true,
+            comments: true,
+            createdAt: true,
             user: {
               select: {
                 id: true,
@@ -47,7 +51,8 @@ export class TwitteRepository {
                 userName: true,
               },
             },
-          }
+          } as any,
+          orderBy: { createdAt: "desc" } as any,
         });
     
         return twittes;
@@ -63,6 +68,22 @@ export class TwitteRepository {
       try {
         const twittes = await prisma.twitte.findMany({
           where: { userId },
+          select: {
+            id: true,
+            content: true,
+            likes: true,
+            replies: true,
+            comments: true,
+            createdAt: true,
+            user: {
+              select: {
+                id: true,
+                name: true,
+                userName: true,
+              },
+            },
+          } as any,
+          orderBy: { createdAt: "desc" } as any,
         });
         return twittes;
       }

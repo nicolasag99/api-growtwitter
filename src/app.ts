@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.routes.js";
 import twitteRoutes from "./routes/twitte.routes.js";
 import followRoutes from "./routes/follow.routes.js";
 import replyRoutes from "./routes/reply.routes.js";
+import commentRoutes from "./routes/comment.routes.js";
 
 import cors from "cors";
 
@@ -21,6 +22,7 @@ app.use("/auth", authRoutes);
 app.use("/twitte", twitteRoutes);
 app.use("/follow", followRoutes);
 app.use("/reply", replyRoutes);
+app.use("/comment", commentRoutes);
 
 const twitteRepository = new TwitteRepository();
 

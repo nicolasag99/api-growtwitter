@@ -25,14 +25,14 @@ export class LikeRepository {
             });
       
             
-            await prisma.twitte.update({
+            const updated = await prisma.twitte.update({
               where: { id: tweetId },
               data: {
                 likes: { increment: 1 }
               }
             });
       
-            return { message: "Like adicionado!" };
+            return { message: "Like adicionado!", added: true, likes: updated.likes };
           } else {
             
             await prisma.like.delete({
@@ -40,14 +40,14 @@ export class LikeRepository {
             });
       
             
-            await prisma.twitte.update({
+            const updated = await prisma.twitte.update({
               where: { id: tweetId },
               data: {
                 likes: { decrement: 1 }
               }
             });
       
-            return { message: "Like removido!" };
+            return { message: "Like removido!", added: false, likes: updated.likes };
           }
       
         } catch (error) {

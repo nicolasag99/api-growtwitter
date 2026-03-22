@@ -63,4 +63,15 @@ export class FollowRepository {
   public async toggleFollow(data: CreateFollow) {
     return this.toggleFollowByLoggedUser(data.followerId, data.followingId);
   }
+
+  public async isFollowing(loggedUserId: string, followingId: string): Promise<boolean> {
+    if (loggedUserId === followingId) return false;
+    const existing = await prisma.follows.findFirst({
+      where: {
+        followerId: loggedUserId,
+        followingId,
+      },
+    });
+    return !!existing;
+  }
 }
