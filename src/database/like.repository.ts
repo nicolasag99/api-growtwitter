@@ -16,38 +16,36 @@ export class LikeRepository {
           });
       
           if (!existingLike) {
-            
             await prisma.like.create({
               data: {
                 userId: loggedUserId,
-                tweetId
-              }
+                tweetId,
+              },
             });
-      
-            
-            const updated = await prisma.twitte.update({
+
+            const tweet = await prisma.twitte.findUnique({
               where: { id: tweetId },
-              data: {
-                likes: { increment: 1 }
-              }
+              include: { _count: { select: { Like: true } } },
             });
-      
-            return { message: "Like adicionado!", added: true, likes: updated.likes };
+            return {
+              message: "Like adicionado!",
+              added: true,
+              likes: tweet?._count.Like ?? 0,
+            };
           } else {
-            
             await prisma.like.delete({
-              where: { id: existingLike.id }
+              where: { id: existingLike.id },
             });
-      
-            
-            const updated = await prisma.twitte.update({
+
+            const tweet = await prisma.twitte.findUnique({
               where: { id: tweetId },
-              data: {
-                likes: { decrement: 1 }
-              }
+              include: { _count: { select: { Like: true } } },
             });
-      
-            return { message: "Like removido!", added: false, likes: updated.likes };
+            return {
+              message: "Like removido!",
+              added: false,
+              likes: tweet?._count.Like ?? 0,
+            };
           }
       
         } catch (error) {

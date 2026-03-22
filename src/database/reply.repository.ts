@@ -49,7 +49,10 @@ export class ReplyRepository {
               userId: true,
             },
           },
-        },
+          _count: {
+            select: { ReplyLike: true },
+          },
+        } as any,
       });
 
       return reply;
@@ -77,8 +80,11 @@ export class ReplyRepository {
               content: true,
             },
           },
-        },
-        orderBy: { createdAt: 'desc' },
+          _count: {
+            select: { ReplyLike: true },
+          },
+        } as any,
+        orderBy: { createdAt: "desc" },
       });
 
       return replies;

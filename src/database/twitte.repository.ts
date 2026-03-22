@@ -40,7 +40,6 @@ export class TwitteRepository {
           select: {
             id: true,
             content: true,
-            likes: true,
             replies: true,
             comments: true,
             createdAt: true,
@@ -51,6 +50,7 @@ export class TwitteRepository {
                 userName: true,
               },
             },
+            _count: { select: { Like: true } },
           } as any,
           orderBy: { createdAt: "desc" } as any,
         });
@@ -71,7 +71,6 @@ export class TwitteRepository {
           select: {
             id: true,
             content: true,
-            likes: true,
             replies: true,
             comments: true,
             createdAt: true,
@@ -82,6 +81,7 @@ export class TwitteRepository {
                 userName: true,
               },
             },
+            _count: { select: { Like: true } },
           } as any,
           orderBy: { createdAt: "desc" } as any,
         });

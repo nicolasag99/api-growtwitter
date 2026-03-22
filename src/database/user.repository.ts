@@ -79,8 +79,8 @@ export class UserRepository {
           twittes: {
             select: {
               content: true,
-              likes: true,
               replies: true,
+              _count: { select: { Like: true } },
             },
           },
         },
