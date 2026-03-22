@@ -36,7 +36,6 @@ model User {
 model Twitte {
   id String @id @default(uuid())
   content String @db.VarChar(500)
-  likes Int @default(0)
   replies Int @default(0)
   comments String @default("") @db.VarChar(300)
   createdAt DateTime @default(now())
@@ -85,7 +84,6 @@ model Reply {
   userId String
   tweetId String
   content String?
-  likes Int @default(0)
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   tweet Twitte @relation(fields: [tweetId], references: [id], onDelete: Cascade)

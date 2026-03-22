@@ -18,27 +18,29 @@ export class ReplyLikeRepository {
           },
         });
 
-        const updated = await prisma.reply.update({
+        const reply = await prisma.reply.findUnique({
           where: { id: replyId },
-          data: {
-            likes: { increment: 1 },
-          },
+          include: { _count: { select: { ReplyLike: true } } },
         });
-
-        return { message: "Like adicionado!", added: true, likes: updated.likes };
+        return {
+          message: "Like adicionado!",
+          added: true,
+          likes: reply?._count.ReplyLike ?? 0,
+        };
       } else {
         await prisma.replyLike.delete({
           where: { id: existingLike.id },
         });
 
-        const updated = await prisma.reply.update({
+        const reply = await prisma.reply.findUnique({
           where: { id: replyId },
-          data: {
-            likes: { decrement: 1 },
-          },
+          include: { _count: { select: { ReplyLike: true } } },
         });
-
-        return { message: "Like removido!", added: false, likes: updated.likes };
+        return {
+          message: "Like removido!",
+          added: false,
+          likes: reply?._count.ReplyLike ?? 0,
+        };
       }
     } catch (error) {
       console.error("Erro ao criar ou remover curtida no comentário:", error);
